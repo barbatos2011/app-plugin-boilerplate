@@ -1,15 +1,16 @@
 #include "plugin.h"
 
 // EDIT THIS: Adapt / remove this function to your needs.
-static bool set_transfer_ui(ethQueryContractUI_t *msg, context_t *context) {
+static bool set_transfer_ui(tronQueryContractUI_t *msg, context_t *context) {
     strlcpy(msg->title, "Transfer To", msg->titleLength);
     context->token_received[0] = ADD_PRE_FIX_BYTE_MAINNET;
-    return getBase58FromAddress(context->token_received, msg->msg, false);
+    getBase58FromAddress(context->token_received, msg->msg, false);
+    return true;
 }
 
 // Set UI for "Receive" screen.
 // EDIT THIS: Adapt / remove this function to your needs.
-static bool set_amount_ui(ethQueryContractUI_t *msg, const context_t *context) {
+static bool set_amount_ui(tronQueryContractUI_t *msg, const context_t *context) {
     strlcpy(msg->title, "Amount", msg->titleLength);
 
     uint8_t decimals = 0;
@@ -23,7 +24,7 @@ static bool set_amount_ui(ethQueryContractUI_t *msg, const context_t *context) {
                          msg->msgLength);
 }
 
-void handle_query_contract_ui(ethQueryContractUI_t *msg) {
+void handle_query_contract_ui(tronQueryContractUI_t *msg) {
     context_t *context = (context_t *) msg->pluginContext;
     bool ret = false;
 
@@ -47,5 +48,5 @@ void handle_query_contract_ui(ethQueryContractUI_t *msg) {
                 PRINTF("Received an invalid screenIndex\n");
         }
     }
-    msg->result = ret ? ETH_PLUGIN_RESULT_OK : ETH_PLUGIN_RESULT_ERROR;
+    msg->result = ret ? TRON_PLUGIN_RESULT_OK : TRON_PLUGIN_RESULT_ERROR;
 }

@@ -48,7 +48,7 @@ set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -ggdb2 -O3")
 
 set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../src")
-set(ETH_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../ethereum-plugin-sdk")
+set(ETH_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../tron-plugin-sdk")
 
 add_compile_definitions(
     APPNAME="PluginBoilerplate"

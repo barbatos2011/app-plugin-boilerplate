@@ -17,5 +17,35 @@
 
 #pragma once
 
-// Empty file, introduced to not break compatibility following plugin-sdk structure rework
-#warning "Deprecated file, the sdk sources have been rationalized in several dedicated files."
+#include <stdint.h>
+#include "common_utils.h"
+
+// NFT
+
+#define COLLECTION_NAME_MAX_LEN 70
+
+typedef struct nftInfo_t {
+    uint8_t contractAddress[ADDRESS_SIZE];  // must be first item
+    char collectionName[COLLECTION_NAME_MAX_LEN + 1];
+} nftInfo_t;
+
+// TOKENS
+
+#define MAX_TICKER_LEN 11  // 10 characters + '\0'
+#define MAX_ITEMS      2
+
+typedef struct tokenDefinition_v2_t {
+    uint8_t address[ADDRESS_SIZE];  // must be first item
+#ifdef HAVE_CONTRACT_NAME_IN_DESCRIPTOR
+    uint8_t contractName[ADDRESS_SIZE];
+#endif
+    char ticker[MAX_TICKER_LEN];
+    uint8_t decimals;
+} tokenDefinition_v2_t;
+
+// UNION
+
+typedef union extraInfo_t {
+    tokenDefinition_v2_t token;
+    nftInfo_t nft;
+} extraInfo_t;

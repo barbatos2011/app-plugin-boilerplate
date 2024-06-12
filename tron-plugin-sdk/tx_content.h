@@ -67,9 +67,9 @@ typedef enum contractType_e {
 typedef struct txContent_t {
     uint64_t amount[2];
     uint64_t exchangeID;
-    uint8_t account[ADDRESS_LENGTH];
-    uint8_t destination[ADDRESS_LENGTH];
-    uint8_t contractAddress[ADDRESS_LENGTH];
+    uint8_t account[ADDRESS_SIZE];
+    uint8_t destination[ADDRESS_SIZE];
+    uint8_t contractAddress[ADDRESS_SIZE];
     uint8_t TRC20Amount[32];
     uint8_t decimals[2];
     char tokenNames[2][MAX_TOKEN_LENGTH];

@@ -24,7 +24,7 @@ include $(BOLOS_SDK)/Makefile.defines
 APPVERSION ?= "$(APPVERSION_M).$(APPVERSION_N).$(APPVERSION_P)"
 
 # Application source files
-APP_SOURCE_PATH += src ethereum-plugin-sdk
+APP_SOURCE_PATH += src tron-plugin-sdk
 
 # Application icons following guidelines:
 # https://developers.ledger.com/docs/embedded-app/design-requirements/#device-icon
@@ -41,7 +41,7 @@ endif
 
 CURVE_APP_LOAD_PARAMS = secp256k1
 
-PATH_APP_LOAD_PARAMS ?= "44'/60'"
+PATH_APP_LOAD_PARAMS ?= "44'/195'"
 
 VARIANT_PARAM = COIN
 VARIANT_VALUES ?= $(NORMAL_NAME)

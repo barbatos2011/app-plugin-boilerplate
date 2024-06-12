@@ -23,23 +23,14 @@
 #include "os.h"
 #include "cx.h"
 
-#define WEI_TO_ETHER 18
-#define ADD_PRE_FIX_BYTE_MAINNET 0x41
-#define ADDRESS_LENGTH 21
-#define INT128_LENGTH  16
-#define INT256_LENGTH  32
+#define ADDRESS_SIZE   21
 #define MAX_TOKEN_LENGTH         67
-#define HASH_SIZE                32
-#define KECCAK256_HASH_BYTESIZE 32
+#define ADD_PRE_FIX_BYTE_MAINNET 0x41
+#define INT256_LENGTH  32
 #define BASE58CHECK_ADDRESS_SIZE 34
+#define HASH_SIZE                32
 
 static const char HEXDIGITS[] = "0123456789abcdef";
-
-#define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
-
-void array_hexstr(char *strbuf, const void *bin, unsigned int len);
-
-uint64_t u64_from_BE(const uint8_t *in, uint8_t size);
 
 bool u64_to_string(uint64_t src, char *dst, uint8_t dst_size);
 
@@ -58,19 +49,6 @@ bool adjustDecimals_v2(const char *src,
                     size_t targetLength,
                     uint8_t decimals);
 
-void getEthAddressFromRawKey(const uint8_t raw_pubkey[static 65],
-                             uint8_t out[static ADDRESS_LENGTH]);
-
-void getEthAddressStringFromRawKey(const uint8_t raw_pubkey[static 65],
-                                   char out[static ADDRESS_LENGTH * 2],
-                                   uint64_t chainId);
-
-bool getEthAddressStringFromBinary(uint8_t *address,
-                                   char out[static ADDRESS_LENGTH * 2],
-                                   uint64_t chainId);
-
-bool getEthDisplayableAddress(uint8_t *in, char *out, size_t out_len, uint64_t chainId);
-
 static __attribute__((no_instrument_function)) inline int allzeroes(const void *buf, size_t n) {
     uint8_t *p = (uint8_t *) buf;
     for (size_t i = 0; i < n; ++i) {
@@ -80,13 +58,5 @@ static __attribute__((no_instrument_function)) inline int allzeroes(const void *
     }
     return 1;
 }
-static __attribute__((no_instrument_function)) inline int ismaxint(uint8_t *buf, int n) {
-    for (int i = 0; i < n; ++i) {
-        if (buf[i] != 0xff) {
-            return 0;
-        }
-    }
-    return 1;
-}
 
-bool getBase58FromAddress(const uint8_t address[static ADDRESS_LENGTH], char *out, bool truncate);
+void getBase58FromAddress(const uint8_t address[static ADDRESS_SIZE], char *out, bool truncate);

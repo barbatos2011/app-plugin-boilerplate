@@ -4,33 +4,33 @@
 #define NAME_LENGTH    3u
 #define VERSION_LENGTH 3u
 
-void handle_init_contract(ethPluginInitContract_t *parameters);
-void handle_provide_parameter(ethPluginProvideParameter_t *parameters);
-void handle_finalize(ethPluginFinalize_t *parameters);
-void handle_provide_token(ethPluginProvideInfo_t *parameters);
-void handle_query_contract_id(ethQueryContractID_t *parameters);
-void handle_query_contract_ui(ethQueryContractUI_t *parameters);
+void handle_init_contract(tronPluginInitContract_t *parameters);
+void handle_provide_parameter(tronPluginProvideParameter_t *parameters);
+void handle_finalize(tronPluginFinalize_t *parameters);
+void handle_provide_token(tronPluginProvideInfo_t *parameters);
+void handle_query_contract_id(tronQueryContractID_t *parameters);
+void handle_query_contract_ui(tronQueryContractUI_t *parameters);
 
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
-    ethPluginInitContract_t init_contract = {0};
-    ethPluginProvideParameter_t provide_param = {0};
-    ethPluginFinalize_t finalize = {0};
-    ethPluginProvideInfo_t provide_info = {0};
-    ethQueryContractID_t query_id = {0};
-    ethQueryContractUI_t query_ui = {0};
+    tronPluginInitContract_t init_contract = {0};
+    tronPluginProvideParameter_t provide_param = {0};
+    tronPluginFinalize_t finalize = {0};
+    tronPluginProvideInfo_t provide_info = {0};
+    tronQueryContractID_t query_id = {0};
+    tronQueryContractUI_t query_ui = {0};
     txContent_t content = {0};
 
     // Fake sha3 context
     cx_sha3_t sha3;
 
-    ethPluginSharedRO_t shared_ro;
+    tronPluginSharedRO_t shared_ro;
     shared_ro.txContent = &content;
 
-    ethPluginSharedRW_t shared_rw;
+    tronPluginSharedRW_t shared_rw;
     shared_rw.sha3 = &sha3;
 
     context_t context;
-    const uint8_t address[ADDRESS_LENGTH] = {0xee, 0xee, 0xee, 0xee, 0xee, 0xee, 0xee,
+    const uint8_t address[ADDRESS_SIZE] = {0xee, 0xee, 0xee, 0xee, 0xee, 0xee, 0xee,
                                              0xee, 0xee, 0xee, 0xee, 0xee, 0xee, 0xee,
                                              0xee, 0xee, 0xee, 0xee, 0xee, 0xee};
 
@@ -50,13 +50,13 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
         return 0;
     }
 
-    init_contract.interfaceVersion = ETH_PLUGIN_INTERFACE_VERSION_LATEST;
+    init_contract.interfaceVersion = TRON_PLUGIN_INTERFACE_VERSION_LATEST;
     init_contract.selector = data;
     init_contract.pluginContext = (uint8_t *) &context;
     init_contract.pluginContextLength = sizeof(context);
 
     handle_init_contract(&init_contract);
-    if (init_contract.result != ETH_PLUGIN_RESULT_OK) {
+    if (init_contract.result != TRON_PLUGIN_RESULT_OK) {
         return 0;
     }
 
@@ -67,7 +67,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
         provide_param.parameterOffset = i;
         provide_param.pluginContext = (uint8_t *) &context;
         handle_provide_parameter(&provide_param);
-        if (provide_param.result != ETH_PLUGIN_RESULT_OK) {
+        if (provide_param.result != TRON_PLUGIN_RESULT_OK) {
             return 0;
         }
         i += 32;
@@ -76,7 +76,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     finalize.pluginContext = (uint8_t *) &context;
     finalize.address = address;
     handle_finalize(&finalize);
-    if (finalize.result != ETH_PLUGIN_RESULT_OK) {
+    if (finalize.result != TRON_PLUGIN_RESULT_OK) {
         return 0;
     }
 
@@ -102,7 +102,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     }
 
     handle_provide_token(&provide_info);
-    if (provide_info.result != ETH_PLUGIN_RESULT_OK) {
+    if (provide_info.result != TRON_PLUGIN_RESULT_OK) {
         return 0;
     }
 
@@ -113,7 +113,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     query_id.versionLength = sizeof(version);
     handle_query_contract_id(&query_id);
 
-    if (query_id.result != ETH_PLUGIN_RESULT_OK) {
+    if (query_id.result != TRON_PLUGIN_RESULT_OK) {
         return 0;
     }
 
@@ -131,7 +131,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
         query_ui.screenIndex = i;
         handle_query_contract_ui(&query_ui);
-        if (query_ui.result != ETH_PLUGIN_RESULT_OK) {
+        if (query_ui.result != TRON_PLUGIN_RESULT_OK) {
             return 0;
         }
         printf("%s: %s\n", title, msg);

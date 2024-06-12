@@ -15,21 +15,21 @@
  *  limitations under the License.
  *****************************************************************************/
 
-#include "eth_plugin_interface.h"
+#include "tron_plugin_interface.h"
 #include "lib_standard_app/swap_lib_calls.h"  // RUN_APPLICATION
 
 // Functions implemented by the plugin
-void handle_init_contract(ethPluginInitContract_t *parameters);
-void handle_provide_parameter(ethPluginProvideParameter_t *parameters);
-void handle_finalize(ethPluginFinalize_t *parameters);
-void handle_provide_token(ethPluginProvideInfo_t *parameters);
-void handle_query_contract_id(ethQueryContractID_t *parameters);
-void handle_query_contract_ui(ethQueryContractUI_t *parameters);
+void handle_init_contract(tronPluginInitContract_t *parameters);
+void handle_provide_parameter(tronPluginProvideParameter_t *parameters);
+void handle_finalize(tronPluginFinalize_t *parameters);
+void handle_provide_token(tronPluginProvideInfo_t *parameters);
+void handle_query_contract_id(tronQueryContractID_t *parameters);
+void handle_query_contract_ui(tronQueryContractUI_t *parameters);
 
-// Calls the ethereum app.
-static void call_app_ethereum() {
+// Calls the tron app.
+static void call_app_tron() {
     unsigned int libcall_params[5];
-    libcall_params[0] = (unsigned int) "Ethereum";
+    libcall_params[0] = (unsigned int) "Tron";
     libcall_params[1] = 0x100;
     libcall_params[2] = RUN_APPLICATION;
     libcall_params[3] = (unsigned int) NULL;
@@ -55,22 +55,22 @@ static void call_app_ethereum() {
 static void dispatch_call(int message, void *parameters) {
     if (parameters != NULL) {
         switch (message) {
-            case ETH_PLUGIN_INIT_CONTRACT:
+            case TRON_PLUGIN_INIT_CONTRACT:
                 handle_init_contract(parameters);
                 break;
-            case ETH_PLUGIN_PROVIDE_PARAMETER:
+            case TRON_PLUGIN_PROVIDE_PARAMETER:
                 handle_provide_parameter(parameters);
                 break;
-            case ETH_PLUGIN_FINALIZE:
+            case TRON_PLUGIN_FINALIZE:
                 handle_finalize(parameters);
                 break;
-            case ETH_PLUGIN_PROVIDE_INFO:
+            case TRON_PLUGIN_PROVIDE_INFO:
                 handle_provide_token(parameters);
                 break;
-            case ETH_PLUGIN_QUERY_CONTRACT_ID:
+            case TRON_PLUGIN_QUERY_CONTRACT_ID:
                 handle_query_contract_id(parameters);
                 break;
-            case ETH_PLUGIN_QUERY_CONTRACT_UI:
+            case TRON_PLUGIN_QUERY_CONTRACT_UI:
                 handle_query_contract_ui(parameters);
                 break;
             default:
@@ -105,9 +105,9 @@ __attribute__((section(".boot"))) int main(int arg0) {
                 // Not called from dashboard: called from the ethereum app!
                 const unsigned int *args = (unsigned int *) arg0;
 
-                // If `ETH_PLUGIN_CHECK_PRESENCE` is set, this means the caller is just trying to
+                // If `TRON_PLUGIN_CHECK_PRESENCE` is set, this means the caller is just trying to
                 // know whether this app exists or not. We can skip `paraswap_plugin_call`.
-                if (args[0] != ETH_PLUGIN_CHECK_PRESENCE) {
+                if (args[0] != TRON_PLUGIN_CHECK_PRESENCE) {
                     dispatch_call(args[0], (void *) args[1]);
                 }
             }
