@@ -24,50 +24,6 @@
 #include "lcx_sha3.h"
 #include "base58.h"
 
-
-bool getBase58FromAddress(const uint8_t address[static ADDRESS_LENGTH], char *out, bool truncate) {
-    uint8_t sha256[HASH_SIZE];
-    uint8_t addchecksum[ADDRESS_LENGTH + 4];
-
-    cx_hash_sha256(address, ADDRESS_LENGTH, sha256, HASH_SIZE);
-    cx_hash_sha256(sha256, HASH_SIZE, sha256, HASH_SIZE);
-
-    memmove(addchecksum, address, ADDRESS_LENGTH);
-    memmove(addchecksum + ADDRESS_LENGTH, sha256, 4);
-
-    base58_encode(addchecksum, sizeof(addchecksum), out, BASE58CHECK_ADDRESS_SIZE);
-    out[BASE58CHECK_ADDRESS_SIZE] = '\0';
-    if (truncate) {
-        memmove((void *) out + 5, "...", 3);
-        memmove((void *) out + 8,
-                (const void *) (out + BASE58CHECK_ADDRESS_SIZE - 5),
-                6);  // include \0 char
-    }
-    return true;
-}
-
-void array_hexstr(char *strbuf, const void *bin, unsigned int len) {
-    while (len--) {
-        *strbuf++ = HEXDIGITS[((*((char *) bin)) >> 4) & 0xF];
-        *strbuf++ = HEXDIGITS[(*((char *) bin)) & 0xF];
-        bin = (const void *) ((unsigned int) bin + 1);
-    }
-    *strbuf = 0;  // EOS
-}
-
-uint64_t u64_from_BE(const uint8_t *in, uint8_t size) {
-    uint8_t i = 0;
-    uint64_t res = 0;
-
-    while (i < size && i < sizeof(res)) {
-        res <<= 8;
-        res |= in[i];
-        i++;
-    }
-
-    return res;
-}
-
 bool u64_to_string(uint64_t src, char *dst, uint8_t dst_size) {
     // Copy the numbers in ASCII format.
     uint8_t i = 0;
@@ -243,93 +199,22 @@ bool amountToString(const uint8_t *amount,
     return true;
 }
 
-void getEthAddressFromRawKey(const uint8_t raw_pubkey[static 65],
-                             uint8_t out[static ADDRESS_LENGTH]) {
-    uint8_t hashAddress[CX_KECCAK_256_SIZE];
-    CX_ASSERT(cx_keccak_256_hash(raw_pubkey + 1, 64, hashAddress));
-    memmove(out, hashAddress + 12, ADDRESS_LENGTH);
-}
+void getBase58FromAddress(const uint8_t address[static ADDRESS_SIZE], char *out, bool truncate) {
+    uint8_t sha256[HASH_SIZE];
+    uint8_t addchecksum[ADDRESS_SIZE + 4];
 
-void getEthAddressStringFromRawKey(const uint8_t raw_pubkey[static 65],
-                                   char out[static ADDRESS_LENGTH * 2],
-                                   uint64_t chainId) {
-    uint8_t hashAddress[CX_KECCAK_256_SIZE];
-    CX_ASSERT(cx_keccak_256_hash(raw_pubkey + 1, 64, hashAddress));
-    getEthAddressStringFromBinary(hashAddress + 12, out, chainId);
-}
+    cx_hash_sha256(address, ADDRESS_SIZE, sha256, HASH_SIZE);
+    cx_hash_sha256(sha256, HASH_SIZE, sha256, HASH_SIZE);
 
-bool getEthAddressStringFromBinary(uint8_t *address,
-                                   char out[static ADDRESS_LENGTH * 2],
-                                   uint64_t chainId) {
-    // save some precious stack space
-    union locals_union {
-        uint8_t hashChecksum[INT256_LENGTH];
-        uint8_t tmp[51];
-    } locals_union;
+    memmove(addchecksum, address, ADDRESS_SIZE);
+    memmove(addchecksum + ADDRESS_SIZE, sha256, 4);
 
-    uint8_t i;
-    bool eip1191 = false;
-    uint32_t offset = 0;
-    switch (chainId) {
-        case 30:
-        case 31:
-            eip1191 = true;
-            break;
+    base58_encode(addchecksum, sizeof(addchecksum), out, BASE58CHECK_ADDRESS_SIZE);
+    out[BASE58CHECK_ADDRESS_SIZE] = '\0';
+    if (truncate) {
+        memmove((void *) out + 5, "...", 3);
+        memmove((void *) out + 8,
+                (const void *) (out + BASE58CHECK_ADDRESS_SIZE - 5),
+                6);  // include \0 char
     }
-    if (eip1191) {
-        if (!u64_to_string(chainId, (char *) locals_union.tmp, sizeof(locals_union.tmp))) {
-            return false;
-        }
-        offset = strnlen((char *) locals_union.tmp, sizeof(locals_union.tmp));
-        strlcat((char *) locals_union.tmp + offset, "0x", sizeof(locals_union.tmp) - offset);
-        offset = strnlen((char *) locals_union.tmp, sizeof(locals_union.tmp));
-    }
-    for (i = 0; i < 20; i++) {
-        uint8_t digit = address[i];
-        locals_union.tmp[offset + 2 * i] = HEXDIGITS[(digit >> 4) & 0x0f];
-        locals_union.tmp[offset + 2 * i + 1] = HEXDIGITS[digit & 0x0f];
-    }
-    if (cx_keccak_256_hash(locals_union.tmp, offset + 40, locals_union.hashChecksum) != CX_OK) {
-        return false;
-    }
-
-    for (i = 0; i < 40; i++) {
-        uint8_t digit = address[i / 2];
-        if ((i % 2) == 0) {
-            digit = (digit >> 4) & 0x0f;
-        } else {
-            digit = digit & 0x0f;
-        }
-        if (digit < 10) {
-            out[i] = HEXDIGITS[digit];
-        } else {
-            int v = (locals_union.hashChecksum[i / 2] >> (4 * (1 - i % 2))) & 0x0f;
-            if (v >= 8) {
-                out[i] = HEXDIGITS[digit] - 'a' + 'A';
-            } else {
-                out[i] = HEXDIGITS[digit];
-            }
-        }
-    }
-    out[40] = '\0';
-
-    return true;
-}
-
-/* Fills the `out` buffer with the lowercase string representation of the pubkey passed in as binary
-format by `in`. (eg: uint8_t*:0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB ->
-char*:"0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB\0" ).*/
-bool getEthDisplayableAddress(uint8_t *in, char *out, size_t out_len, uint64_t chainId) {
-    if (out_len < 43) {
-        strlcpy(out, "ERROR", out_len);
-        return false;
-    }
-    out[0] = '0';
-    out[1] = 'x';
-    if (!getEthAddressStringFromBinary(in, out + 2, chainId)) {
-        strlcpy(out, "ERROR", out_len);
-        return false;
-    }
-
-    return true;
 }

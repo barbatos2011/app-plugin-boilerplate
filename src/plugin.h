@@ -18,7 +18,7 @@
 #pragma once
 
 #include <string.h>
-#include "eth_plugin_interface.h"
+#include "tron_plugin_interface.h"
 
 // All possible selectors of your plugin.
 // EDIT THIS: Enter your selectors here, in the format X(NAME, value)
@@ -58,7 +58,7 @@ typedef enum {
 typedef struct context_s {
     // For display.
     uint8_t amount_received[INT256_LENGTH];
-    uint8_t token_received[ADDRESS_LENGTH];
+    uint8_t token_received[ADDRESS_SIZE];
     char ticker[MAX_TICKER_LEN];
     uint8_t decimals;
     uint8_t token_found;

@@ -1,7 +1,7 @@
 #include "plugin.h"
 
 
-static void handle_transfer(ethPluginProvideParameter_t *msg, context_t *context) {
+static void handle_transfer(tronPluginProvideParameter_t *msg, context_t *context) {
     switch (context->next_param) {
         case TO_ADDRESS:
             copy_address(context->token_received, msg->parameter, sizeof(context->token_received));
@@ -14,12 +14,12 @@ static void handle_transfer(ethPluginProvideParameter_t *msg, context_t *context
         // Keep this
         default:
             PRINTF("Param not supported: %d\n", context->next_param);
-            msg->result = ETH_PLUGIN_RESULT_ERROR;
+            msg->result = TRON_PLUGIN_RESULT_ERROR;
             break;
     }
 }
 
-void handle_provide_parameter(ethPluginProvideParameter_t *msg) {
+void handle_provide_parameter(tronPluginProvideParameter_t *msg) {
     context_t *context = (context_t *) msg->pluginContext;
     // We use `%.*H`: it's a utility function to print bytes. You first give
     // the number of bytes you wish to print (in this case, `PARAMETER_LENGTH`) and then
@@ -29,7 +29,7 @@ void handle_provide_parameter(ethPluginProvideParameter_t *msg) {
            PARAMETER_LENGTH,
            msg->parameter);
 
-    msg->result = ETH_PLUGIN_RESULT_OK;
+    msg->result = TRON_PLUGIN_RESULT_OK;
 
     // EDIT THIS: adapt the cases and the names of the functions.
     switch (context->selectorIndex) {
@@ -38,7 +38,7 @@ void handle_provide_parameter(ethPluginProvideParameter_t *msg) {
             break;
         default:
             PRINTF("Selector Index not supported: %d\n", context->selectorIndex);
-            msg->result = ETH_PLUGIN_RESULT_ERROR;
+            msg->result = TRON_PLUGIN_RESULT_ERROR;
             break;
     }
 }

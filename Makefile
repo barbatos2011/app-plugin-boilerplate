@@ -23,4 +23,4 @@ APPVERSION_M = 1
 APPVERSION_N = 0
 APPVERSION_P = 0
 
-include ethereum-plugin-sdk/standard_plugin.mk
+include tron-plugin-sdk/standard_plugin.mk
