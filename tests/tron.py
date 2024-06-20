@@ -224,8 +224,9 @@ class TronClient:
         # Split transaction in multiples APDU
         data = pack_derivation_path(path)
         data += tx
-        assert (len(data) < MAX_APDU_LEN)
-        messages.append(data)
+        # assert (len(data) < MAX_APDU_LEN)
+        for i, (chunk) in enumerate(chunked(MAX_APDU_LEN, data)):
+            messages.append(chunk)
         token_pos = len(messages)
 
         for signature in signatures:

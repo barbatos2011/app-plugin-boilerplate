@@ -25,8 +25,9 @@
 // A Xmacro below will create for you:
 //     - an enum named selector_t with every NAME
 //     - a map named SELECTORS associating each NAME with it's value
-#define SELECTORS_LIST(X)                    \
-    X(TRANSFER, 0xa9059cbb)
+#define SELECTORS_LIST(X)   \
+    X(TRANSFER, 0xa9059cbb) \
+    X(SWAP_EXACT_TOKENS_FOR_TOKENS, 0x38ed1739)
 
 // Xmacro helpers to define the enum and map
 // Do not modify !
@@ -46,10 +47,16 @@ extern const uint32_t SELECTORS[SELECTOR_COUNT];
 
 // Enumeration used to parse the smart contract data.
 // EDIT THIS: Adapt the parameter names here.
-typedef enum {
+typedef enum
+{
     UNEXPECTED_PARAMETER,
     TO_ADDRESS,
     AMOUNT_UINT256,
+    AMOUNT_IN,
+    AMOUNT_OUT_MIN,
+    TOKEN_RECEIVED,
+    PATH_OFFSET,
+    PATH_LENGTH,
 } parameter;
 
 // Shared global memory with Ethereum app. Must be at most 5 * 32 bytes.
@@ -57,7 +64,9 @@ typedef enum {
 // will need to adapt this struct to your plugin.
 typedef struct context_s {
     // For display.
-    uint8_t amount_received[INT256_LENGTH];
+    uint8_t amount_in[INT256_LENGTH];
+    uint8_t amount_out[INT256_LENGTH];
+    uint8_t to_address[ADDRESS_SIZE];
     uint8_t token_received[ADDRESS_SIZE];
     char ticker[MAX_TICKER_LEN];
     uint8_t decimals;

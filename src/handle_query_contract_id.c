@@ -13,7 +13,14 @@ void handle_query_contract_id(tronQueryContractID_t *msg) {
     if (context->selectorIndex == TRANSFER) {
         strlcpy(msg->version, "Transfer", msg->versionLength);
         msg->result = TRON_PLUGIN_RESULT_OK;
-    }  else {
+    }
+    else if (context->selectorIndex == SWAP_EXACT_TOKENS_FOR_TOKENS)
+    {
+        strlcpy(msg->version, "Swap", msg->versionLength);
+        msg->result = TRON_PLUGIN_RESULT_OK;
+    }
+    else
+    {
         PRINTF("Selector index: %d not supported\n", context->selectorIndex);
         msg->result = TRON_PLUGIN_RESULT_ERROR;
     }

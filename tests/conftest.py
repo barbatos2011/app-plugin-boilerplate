@@ -1,6 +1,7 @@
-
+import pytest
 from ragger.conftest import configuration
-
+from ragger.navigator import NavInsID, NavIns
+from ragger.backend import SpeculosBackend, BackendInterface
 
 ###########################
 ### CONFIGURATION START ###
@@ -15,6 +16,7 @@ configuration.OPTIONAL.BACKEND_SCOPE = "class"
 
 MNEMONIC = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"
 configuration.OPTIONAL.CUSTOM_SEED = MNEMONIC
+
 #########################
 ### CONFIGURATION END ###
 #########################

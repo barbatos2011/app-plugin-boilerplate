@@ -44,6 +44,9 @@ void handle_init_contract(tronPluginInitContract_t *msg) {
         case TRANSFER:
             context->next_param = TO_ADDRESS;
             break;
+        case SWAP_EXACT_TOKENS_FOR_TOKENS:
+            context->next_param = AMOUNT_IN;
+            break;
         // Keep this
         default:
             PRINTF("Missing selectorIndex: %d\n", context->selectorIndex);

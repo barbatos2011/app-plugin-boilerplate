@@ -8,6 +8,9 @@ void handle_finalize(tronPluginFinalize_t *msg) {
         case TRANSFER:
             msg->numScreens = 2;
             break;
+        case SWAP_EXACT_TOKENS_FOR_TOKENS:
+            msg->numScreens = 4;
+            break;
         default:
             PRINTF("Selector Index not supported: %d\n", context->selectorIndex);
             msg->result = TRON_PLUGIN_RESULT_ERROR;
